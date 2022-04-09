@@ -150,7 +150,7 @@ Vrlo jednostavno, paket **api** definira interface za servise koji pristupaju na
 
 Infrstrukturni sloj definirat ce adapter prema nasem portu i to je magija koja ce se dogoditi, ali domena ce pristupati iskljucivo portu, tj. nacrtu.
 
-![API](implementation_adapter.png)
+![SPI](implementation_adapter.png)
 
 
 Primjer domenskoga objekta:
@@ -433,3 +433,6 @@ Osim toga, u infrastructure dijelu, imat cemo adaptere koji ce implementirati sp
 Da pokusamo biti maksimalno plasticni. Ako zelite generirati PDF i imate neki skup klasa koji se upotrebljava u vise domena. Implementacija tog PDF generatora, nalazit ce se u ./infrastructure/pdf/...
 
 Medjutim, nacrt metoda koje cemo pozivati unutar domene bit ce definiran u portu, neki model koji cemo koristiti u domeni, bit ce definiran u domeni, ali taj port, bit ce implementiran u ./infrastructure/pdf/... kroz neki servis/klijent/fasadu. Dakle, bitno je positvari osnovni "ugovor" koji propisuje heksagonalna arhitektura - sve ovisi o domeni, domena ne ovisi ni o cemu (direktno).
+
+![jdbc_call](jdbc_adapter.png)
+
