@@ -17,23 +17,24 @@ Slojevita arhitektura u enterprise java aplikacijama postoji odvajkada, ona je i
 
 ![Layered arhitecture](sapr_0102.png)
 
-Medjutim, slojevita arhitektura iako naoko jednostavna i logicna ima svoje mana. One se najbolje ocituju kad proizvod koji razvijamo pocne bujati i tada se troslojna arhitektura iz softverskoga inzenjerstva pretvara u gradjevinski rad i zbukanje. Svaka nova funkcionalnost novi je problem.
+Medjutim, slojevita arhitektura, iako naoko jednostavna i logicna, ima svoje mana. One se najbolje ocituju kad proizvod koji razvijamo pocne bujati i tada se troslojna arhitektura iz softverskoga inzenjerstva pretvara u gradjevinski rad i zbukanje. Svaka nova funkcionalnost novi je problem.
 
 ### Nije problem, imam 10000 klasa u dao sloju i lijepo mi je!
 
-Jedan od glavnih problema slojevite arhitekture jest to sto je oja najcesce podijeljena upravo na nekoliko uobicajenih paketa. U gotovo svakom projektu naici cemo, u razlicitim imenovnim doskocicama, na pakete "dto", "dao", "repository", "domain", "model", "service", "core"...
+Jedan od glavnih problema slojevite arhitekture jest to sto je ona najcesce podijeljena upravo na nekoliko uobicajenih paketa. U gotovo svakom projektu naici cemo, u razlicitim imenovnim doskocicama, na pakete "dto", "dao", "repository", "domain", "model", "service", "core"...
+U jednini i mnozini i u raznim kombinacijama, ali u biti jednako.
 
 Zamislite da pocnete graditi aplikaciju za jednostavnu elektronicku trgovinu koja ce na kraju postati eBay. U pocetku mozete pretpostaviti samo ono sto znadete, a to je da zelite jednostavnu trgovinu i to je posve u redu. Medjutim, kako potrebe budu rasle, projekt ce u jednom trenutku puknuti i to ne iz razloga sto ce biti apsolutno tesko citljiv i sto ce biti nemoguce navigirati po bespucima klasa. Programeri se tome uvijek dovinu, makar bilo jednostavno lose i tesko.
 
 Problem ce biti u skaliranju. U jednom trenutku cete shvatiti da je obrada narudzbi kriticna i da je potrebno osigurati nisku latenciju i visoku dostupnost, dok je za reklame to nevazno.
 
-Pokusat cete raditi sto i dosad - skalirati. Jos jedan worker, jos  jedna VM u regiji i to ce doseci plafon i postati skupo, ruzno i naprosto nemoguce.
+Pokusat cete raditi sto i dosad - skalirati monolit. Jos jedan worker, jos  jedna VM u regiji i to ce doseci plafon i postati skupo, ruzno i naprosto nemoguce.
 
-Sljedeci korak jest pokusati to nekako izdvojiti u nekoliko servisa pa skalirati one bitne. Napraviti medjusobnu komunikaciju, bilo asinkronu reda poruka, bilo sinkornu preko starih dobrih REST upita. Medjutim, tu ce vas docekati problem iz naslova - 10000 klasa u paketu.
+Sljedeci korak jest pokusati to nekako izdvojiti u nekoliko servisa pa skalirati one bitne. Napraviti medjusobnu komunikaciju, bilo asinkronu preko reda poruka, bilo sinkornu preko starih dobrih REST upita. Medjutim, tu ce vas docekati problem iz naslova - 10000 klasa u paketu.
 
 ### Treba mi NoSql
 
-Drugi problem koji, premda zapravo rijedak u praksi, u kompleksinijim projektima gdje se cesto nailazi na uska grla i performansne probleme ipak se moze dogoditi da se odluci da umjesto dohvata iz relacijske baze zelimo spremati neke podatke u key-value store, primjerice.
+Drugi problem koji se, premda zapravo rijedak u praksi, u kompleksinijim projektima gdje se cesto nailazi na uska grla i performansne probleme ipak moze dogoditi jest to da se odluci da umjesto dohvata iz relacijske baze zelimo spremati neke podatke u key-value store, primjerice.
 Medjutim, zelimo ostaviti korisnicima mogucnost da koriste i relacijsku bazu, ovisno o zastavici u application.yaml.
 
 U slojevitoj arhitekturi taj potez sastojat ce se od nekoliko koraka:
@@ -56,18 +57,20 @@ Kad znamo da radimo sicu, treba prestati razmisljati i jednostavno napraviti dto
 
 Heksagonalna arhitektura zauzima jedan drugi stav pri dizajnu aplikacije, a to je da je u sredistu aplikacije domena, tj. (kompleksna) poslovna logika koju pokusavamo pretociti u aplikaciju. Sve ostalo - spremiste podataka, kontroleri, routeri, consumeri, prezentacija podataka, klijenti, to se sve naslanja na domenu i treba zapravo zadovoljavati potrebe domene, tj. neki nacrt koji je definiran u domeni. Dakle glavna razlika izmedju troslojne arhitekture i heksagonalne jest u tome da nemamo tranzitivnu ovisnost, dakle sloj koji ovisi o sloju ispod njega, nego sve ovisi o domeni.
 
-Zamislite domenu kao puzzlu koja ima ulazne i izlazne spojke i na koju se nabadaju ostale puzzle.
+Zamislite domenu kao puzlu koja ima ulazne i izlazne spojke i na koju se nabadaju ostale puzle.
 
 ![Hexagonal arhitecture](hexagonal.png)
 
 ### Kada razmisliti o heksagonalnoj?
 
-Vrlo jednostavno, onda kad pocnete dobivati dojam da aplikacija ima kompleksnu domenu, da poslovna pravila postaju nesto o cemu treba razmisljati.
+Vrlo jednostavno, onda kad pocnete dobivati dojam da aplikacija ima kompleksnu domenu, da poslovna pravila postaju nesto o cemu treba razmisljati mnogo vise nego sto potrosite vremena na replikaciju obicno kotnrolera.
 
 Ne postoji zlatno pravilo, ali kad imate nekoliko many-to-many relacija, kada podatci prolaze kroz vise faza i imate ociti pipeline ili kad postaje jasno da ce dijelove aplikacije trebati skalirati u buducnosti i izdvajati u zasebne mikroservise, tada valja razmisliti o heksagonalnoj arhitekturi.
 
 
 ### DDD
+
+
 
 ### Heksagonalna u Spring Bootu i raspored paketa
 
@@ -81,7 +84,7 @@ To znaci da cemo u sredistu imati domenu. U spring boot aplikaciju to ce u praks
 
 Zatim cemo imati boundary. Unutar boundaryja imat cemo kontrolere, routere, consumere za redove poruka...
 
-I naposljetku infrastrucure. U infrastructure nalazit ce se storage, pristup cloud servisima...
+I naposljetku infrastrucure. U infrastructure nalazit ce se storage, pristup cloud servisima, implementacije klijenata...
 
 ```
 ├── boundary
@@ -129,7 +132,7 @@ Srce vase aplikacije. Ono sto klijent od vas trazi i ono sto mu mozete i trebate
 Kod modeliranja domene uvijek je bitno pokusati da stvari budu modularne, dobro imenovane, prosirive, da poslovna pravila budu izdvojezna u zasebne klase, da budu lako promjenjiva. 
 Ovdje cete upotrebljavati obrasce koji vam se cine naravnima - strategije, chain of responsabiliy, memento, fasade, command, decorator...
 
-Domena za pocetak ima domenski objekt, taj domenski objekt mora biti potpuno apstrahiran od bilo kakve ORM biblioteke. U osnovi radi se o agregatnom korijenu u DDD terkinologiji koji zatim obuhvaca niz entiteta (to nisu entityji iz JPA! sami po sebi) i value objekata. Kao sto je vec receno u DDD poglavlju entiteti su mutable klase, value objekti su immutable, cesto cemo graditi preko buildera i anotirati s @Value anotacijom iz Lomboka ili cemo koristiti record ako se radi o javi 17+.
+Domena za pocetak ima domenski objekt, taj domenski objekt mora biti potpuno apstrahiran od bilo kakve ORM biblioteke. U osnovi radi se o agregatnom korijenu u DDD terminologiji koji zatim obuhvaca niz entiteta (to nisu entityji iz JPA! sami po sebi) i value objekata. Kao sto je vec receno u DDD poglavlju entiteti su mutable klase, value objekti su immutable, cesto cemo graditi preko buildera i anotirati s @Value anotacijom iz Lomboka ili cemo koristiti record ako se radi o javi 17+.
 
 Kao sto je receno u DDD poglavlju, domenski objekti moraju biti bogati! Koristimo OOP i sasvim je naravno da domenski objekti imaju staticke ili clanske metode koje ih mijenjaju, izracunavaju nesto, odradjuju neku logiku, koristite OOP principe kod dizjna, entiteti nisu lista atributa nego objekti.
 
@@ -137,11 +140,11 @@ Nekad, medjutim, nije moguce svu logiku implementirati unutar domenskoga objekta
 
 ##### API i SPI
 
-Kao sto smo i rekli. Sve se u heksagonalnoj arhitekturi "kopca" na domenu. Medjutim, storage dio aplikacije prirodno ne ovisi o domeni, zapitat cete se. Tako je, zato u troslojnoj arhitekturi imamo tranzitivnu ovisnost. U heksagonalnoj arhitekturi radimmo svojevrsni obrat. Domena ce u svom paketu, kao sto je vidljivo na gornjoj slici imati paket port i u njemu pakete spi i api. Sto su oni?
+Kao sto smo i rekli. Sve se u heksagonalnoj arhitekturi "kopca" na domenu. Medjutim, storage dio aplikacije prirodno ne ovisi o domeni, zar ne, zapitat cete se. Tako je, zato u troslojnoj arhitekturi imamo tranzitivnu ovisnost. U heksagonalnoj arhitekturi radimo svojevrsni obrat. Domena ce u svom paketu, kao sto je vidljivo na gornjoj slici imati paket port i u njemu pakete spi i api. Sto su oni?
 
-Vrlo jednostavno, paket api definira interface za servise koji pristupaju nama, dakle kontroler ce preko api interfacea pristupati domeni, tj. pozivati metode iz domene. Dakle api definira nacrt metoda koje pruzamo kao domenski dio.
+Vrlo jednostavno, paket **api** definira interface za servise koji pristupaju nama - kontroler ce preko api interfacea pristupati domeni, tj. pozivati metode iz domene. Dakle, api definira nacrt metoda koje pruzamo kao domenski dio.
 
-Spi je "obrat". U paketu spi definirat cemo interface kojima mi pristupamo kao domena. Na pr. u spi paketu definirat cemo repozitorije. To nisu JPA repozitoriji, ti repozitoriji vracaju domenske objekte, one apstrahirane od ORM-a. Dakle, najprostije receno, spi definira nas pristup prema infrastrukturnom sloju, ali mi o njemu ne ovisimo, to je iznimno bitno.
+**Spi** (Service Provider Interface) je onaj spomenuti "obrat". U paketu spi definirat cemo interface kojima mi pristupamo kao domena. Na pr. u spi paketu definirat cemo repozitorije. To nisu JPA repozitoriji, ti repozitoriji vracaju domenske objekte, one apstrahirane od ORM-a. Dakle, najprostije receno, spi definira nas pristup prema infrastrukturnom sloju, ali mi o njemu ne ovisimo, to je iznimno bitno.
 
 Infrstrukturni sloj definirat ce adapter prema nasem portu i to je magija koja ce se dogoditi, ali domena ce pristupati iskljucivo portu, tj. nacrtu.
 
@@ -341,7 +344,7 @@ public class OrderService implements PlaceOrder, ManageOrder {
 
 ```
 
-Osim navedenih dijelova i djelica domene, imat cemo naravno i mappere (ako upotrebljavamo neke klijente), command paket s naredbama za servise/fasade, validatore, exceptione, sve sto je vezano za domenu.
+Osim navedenih dijelova i djelica domene, imat cemo naravno i command paket s naredbama za servise/fasade, validatore, exceptione, sve sto je vezano za domenu.
 
 #### Boundary
 
@@ -421,3 +424,7 @@ Zapravo, sve ono sto ostaje. Sve sto osjecate da bi mogao biti library. Na pr. k
 Ono sto je bitno uociti da ovdje imenovanje paketa ide /infrastructure/{persistence, messaging, logging}/ime_domene
 
 Osim toga, u infrastructure dijelu, imat cemo adaptere koji ce implementirati spi portove iz domene i "prilagodjavati" nase libraryje/persistence, bilo sto u objekte definirane ugovorm tj. portom u domeni.
+
+Da pokusamo biti maksimalno plasticni. Ako zelite generirati PDF i imate neki skup klasa koji se upotrebljava u vise domena. Implementacija tog PDF generatora, nalazit ce se u ./infrastructure/pdf/...
+
+Medjutim, nacrt metoda koje cemo pozivati unutar domene bit ce definiran u portu, neki model koji cemo koristiti u domeni, bit ce definiran u domeni, ali taj port, bit ce implementiran u ./infrastructure/pdf/... kroz neki servis/klijent/fasadu. Dakle, bitno je positvari osnovni "ugovor" koji propisuje heksagonalna arhitektura - sve ovisi o domeni, domena ne ovisi ni o cemu (direktno).
