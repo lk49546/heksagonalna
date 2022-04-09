@@ -1,6 +1,6 @@
 # Prijedlog arhitekture za Spring Boot aplikacije 
 
-## Hexagonalna arhitektura
+## Heksagonalna arhitektura
 
 
 Termin heksagonalna arhitektura u upotrebi je vec neko vrijeme, a kao alternativni izrazi, s posve istim znacenjem, spominje se i "ports and adapters" arhitektura.
@@ -144,9 +144,15 @@ Kao sto smo i rekli. Sve se u heksagonalnoj arhitekturi "kopca" na domenu. Medju
 
 Vrlo jednostavno, paket **api** definira interface za servise koji pristupaju nama - kontroler ce preko api interfacea pristupati domeni, tj. pozivati metode iz domene. Dakle, api definira nacrt metoda koje pruzamo kao domenski dio.
 
+
+![API](implementation_adapter.png)
+
 **Spi** (Service Provider Interface) je onaj spomenuti "obrat". U paketu spi definirat cemo interface kojima mi pristupamo kao domena. Na pr. u spi paketu definirat cemo repozitorije. To nisu JPA repozitoriji, ti repozitoriji vracaju domenske objekte, one apstrahirane od ORM-a. Dakle, najprostije receno, spi definira nas pristup prema infrastrukturnom sloju, ali mi o njemu ne ovisimo, to je iznimno bitno.
 
 Infrstrukturni sloj definirat ce adapter prema nasem portu i to je magija koja ce se dogoditi, ali domena ce pristupati iskljucivo portu, tj. nacrtu.
+
+![API](client_adapter.png)
+
 
 Primjer domenskoga objekta:
 
