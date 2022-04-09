@@ -76,11 +76,11 @@ DDD je skup dizajnerskih obrazaca i odredjenih gradjevnih jedinica koje mozete k
 
 DDD se nacelno sastoji od dva pristupa. Prvi je strateski DDD koji se vise oslanja na suradnju sa strucnjacima za odredjenu domenu (poslovnjaci, ljudi koji znaju sto zele dobiti na kraju). Drugi je takticki DDD. Ako vas nazivlje pomalo podsjeca na vojne termine, u potpunosti ste u pravu.
 
-Mi cemo se ovdje baviti taktickim dizajnom, tj. organizacijom koda (u vojnom smislu organizacija vodova, timova, brigada), ne cemo se baviti strategijom.
+Mi cemo se ovdje baviti taktickim dizajnom, tj. organizacijom koda (u vojnom smislu organizacija vodova, timova, brigada), necemo se baviti strategijom.
 
 Dizajn je iterativni proces i stoga ima smisla kombinirati strateski i takticki dizajn. Pocinjete sa strateškim dizajnom, razgovarate, otkrivate domenu - ucite, nakon cega slijedi takticki dizajn. Najveca otkrica i otkrica u dizajnu modela domene vjerojatno ce se dogoditi tijekom taktickog dizajna, a to zauzvrat moze utjecati na strateski dizajn i tako cete ponoviti proces.
 
-DDD je vrlo kompleksan, ponekad tesko ostvariv u praksi i stoga nece biti moguce da detaljno obradimo svaki dio DDD-a. Nas ovdje DDD zanima kao skup alata koji ce nam pomoci da pretocimo nasu domenu koju smo saznali tijekom sastanaka i razgovora sa strucnjacima ili preko specifikacija u kod.
+DDD je vrlo kompleksan, ponekad tesko ostvariv u praksi i stoga nece biti moguce da detaljno obradimo svaki dio DDD-a. Nas ovdje DDD zanima kao skup alata koji ce nam pomoci da pretocimo nasu detalje nase domene o kojima smo saznali tijekom sastanaka i razgovora sa strucnjacima ili preko specifikacija u kod.
 Tocnije, zanimaju nas alati za dizajn nase domene, ono sto ce kasnije zavrsiti u paketu domain u nasoj heksagonalnoj arhitekturi.
 
 #### Value objekti
@@ -90,7 +90,7 @@ On je nepromjenjiv (engl. immutable) i time savrsen kandidat za record ili @Valu
 
 Drugi razlog zasto su value objekti vazni je taj sto unutar njih mozemo napraviti i validaciju. Na pr. umjesto koristenja obicnoga stringa unutar entiteta, mozemo kristiti klasu Email koja ce enkapsulirati string zajedno s validacijom, metodama za dohvat domene i vrsne domene.
 
-Tu su stvari prilicno jasne. Nekad medjutim, nismo sigurni bi li trebalo modelirati neke stvari kao entitete ili value objekte, jedna od takvih stvari jest stavke narudzbe. Stavka narudzbe ne moze postojati izvan narudzbe ili samostalno, ali u nekim tehnologijama poput relacijske baze jako je tesko modelirati tablice na takav nacin i prirodno se namece one-to-many relacija. S druge strane, stavka narudzbe se cesto mijenja, pa je nekako priodnno da objekt bude promjenjiv (engl. mutable). U tim slucajevima ne postoji zlatno pravilo i najbolje je modelirati prema instinktu.
+Tu su stvari prilicno jasne. Nekad medjutim, nismo sigurni bi li trebalo modelirati neke stvari kao entitete ili value objekte, jedna od takvih stvari jest stavke narudzbe. Stavka narudzbe ne moze postojati izvan narudzbe ili samostalno, ali u nekim tehnologijama poput relacijske baze jako je tesko modelirati tablice na takav nacin i prirodno se namece one-to-many relacija. S druge strane, stavka narudzbe se cesto mijenja, pa je nekako priodno da objekt bude promjenjiv (engl. mutable). U tim slucajevima ne postoji zlatno pravilo i najbolje je modelirati prema instinktu.
 
 Primjer, klasa Money (obuhvaca valutu i iznos te clanske metode): 
 
@@ -137,7 +137,7 @@ public class Money implements Serializable, Comparable<Money> {
 
 #### Entititeti
 
-Kao sto je vec spomenutu gore, uz value objekte postoje i entiteti. S entitetima smo nekako svi vec upoznati kroz JPA terminologiju koja je zapravo preuzeta iz DDD-a. Razlika izmedju entiteta i value objekta je ta da value objekt je isti ako su mu svi atributi isti. Odnosno, da pokusamo to bolje izreci kroz primjer - ako imamo deset email i medju njima tri adrese su pero@pero.com, nama su tada te tri adrese jednake, premda su tri, one nemaju nikakav dodatni identitet, niti je on nama bitan, bitan namm je sadrzaj.
+Kao sto je vec spomenutu gore, uz value objekte postoje i entiteti. S entitetima smo nekako svi vec upoznati kroz JPA terminologiju koja je zapravo preuzeta iz DDD-a. Razlika izmedju entiteta i value objekta jest ta da je value objekt isti ako su mu svi atributi isti. Odnosno, da pokusamo to bolje izreci kroz primjer - ako imamo deset instanci klase email i medju njima tri adrese su pero@pero.com, nama su tada te tri adrese jednake, premda su tri, one nemaju nikakav dodatni identitet, niti je on nama bitan, bitan nam je sadrzaj.
 
 S druge strane, covjek danas moze imati plavu majicu i tenisice, a sutra odijelo i cipele, moze promijeniti ime i prezime, ali je on i dalje taj isti covjek.
 
@@ -198,7 +198,7 @@ public class Person {
 
 Kako smo obradili dvije glavne sastojnice DDD-a, preostaje nam odgovoriti na pitanje kako se to uklapa u cjelinu? Gdje je ljepilo? Odgovor je u **agregatu**. Agregat je grupa entiteta s agregatnim cvorom, dakle vrsnim entitetom kojega dohvacamo kao cjelinu. Tocnije: 
 
-- Agregate se stvara, dohvasa i sprema kao cjelina.
+- Agregate se stvara, dohvaca i sprema kao cjelina.
 - Agregat je uvijek u konzistentnom stanju
 - Na vrhun agregata se nalazi entitet sa svojim identitetom koji je ujednom identitet agregata
 
@@ -210,9 +210,9 @@ Dobre prakse:
 
 - Jedna transakcija mijenja jedan agregat
 - Modelirati manje agregate
-- Agregat A i agregat B kouniciraju iskljucivo preko njihovoga id-a, entitet u agregatu A ne moze direktno komunicirati s entitetom u agregatu B
+- Agregat A i agregat B komuniciraju iskljucivo preko njihovoga id-a, entitet u agregatu A ne moze direktno komunicirati s entitetom u agregatu B
 - Preferirati upotrebu evenata ako promjena na agregatu A treba da uzrokuje promjenu na agregatu B
-- Preferirati optimmistic locking
+- Preferirati optimistic locking
 
 #### Repozitoriji
 
@@ -220,7 +220,7 @@ Manje-vise svatko tko je upoznat s JPA-om zna za repozitorije, taj koncept je uz
 
 #### Poteskoce?
 
-Najveca teskoca u radu s DDD bit ce dodatni rucni posao, tj. mapiranje iz ORM-a u nase domenske objekte. U prijevodu - jako puno mapiranja. Ako se odlucimo za document-base baze podataka poput monga, tada je nas zadatak puno laksi, jer mongo omogucava spremanje nestrukturiranih podataka i lijepo se uklapa u DDD filozofiju. S RDBMS sustavima to nazalost ne stoji.
+Najveca teskoca u radu s DDD bit ce dodatni rucni posao, tj. mapiranje iz ORM-a u nase domenske objekte. U prijevodu - jako puno mapiranja. Ako se odlucimo za document-based baze podataka poput monga, tada je nas zadatak puno laksi, jer mongo omogucava spremanje nestrukturiranih podataka i lijepo se uklapa u DDD filozofiju. S RDBMS sustavima to nazalost ne stoji.
 
 ### Heksagonalna u Spring Bootu i raspored paketa
 
@@ -500,6 +500,10 @@ public class OrderService implements PlaceOrder, ManageOrder {
 ```
 
 Osim navedenih dijelova i djelica domene, imat cemo naravno i command paket s naredbama za servise/fasade, validatore, exceptione, sve sto je vezano za domenu.
+
+##### Common?
+
+Dakako, postoji mogucnost da servis iz domene A i servis iz domene B upotrebljavaju klijent za generiranje izvjesca u PDF formatu. Tada ne treba razbijati glavu, nego jednostavno napravimo novi paket u domain paketu koji ce se zvati PDF, definiramo spi port unutra i objekt kojim ce se koristiti domane A i domena B, recimo PdfReport. Stovise, mozemo nase "prave" domenske dijelove gdje imamo agregate i implementacije API intefacea staviti u potpaket application, pa cemo imati /domain/pdf/{PdfReport, PdfOperations} i /domain/application/{Order, Purchase, Inventory}.
 
 #### Boundary
 
